@@ -30,5 +30,13 @@ desktop.ini
 !.env.example
 
 # === PDCA / bkit ===
+.bkit/
 docs/.bkit-memory.json
 docs/.pdca-status.json
+
+# === Report ===
+report/
+
+# === Claude Code ===
+.claude/
+CLAUDE.md

@@ -1,4 +1,4 @@
-# Traffic Generator Design Document
+# Traffic Generator 설계 문서
 
 > **Summary**: 특정 URL에 설정된 수치만큼 트래픽을 발생시키는 웹서비스의 기술 설계
 >
@@ -11,16 +11,16 @@
 
 ---
 
-## 1. Overview
+## 1. 개요
 
-### 1.1 Design Goals
+### 1.1 설계 목표
 
 - 사용자가 직관적으로 트래픽 설정 및 실행을 할 수 있는 SPA 구현
 - Spring Boot 기반 백엔드에서 비동기로 대량 HTTP 요청을 처리
 - SSE(Server-Sent Events)를 통한 실시간 진행 상태 전달
 - 프론트엔드/백엔드 분리 구조로 독립적 배포 가능
 
-### 1.2 Design Principles
+### 1.2 설계 원칙
 
 - 단순성: 설정 → 실행 → 모니터링 3단계 UX
 - 비동기 처리: 대량 요청을 논블로킹으로 처리하여 서버 안정성 확보
@@ -28,9 +28,9 @@
 
 ---
 
-## 2. Architecture
+## 2. 아키텍처
 
-### 2.1 Component Diagram
+### 2.1 컴포넌트 다이어그램
 
 ```
 ┌──────────────────┐         ┌──────────────────────────────┐
@@ -49,7 +49,7 @@
         :3000                          :8080
 ```
 
-### 2.2 Data Flow
+### 2.2 데이터 흐름
 
 ```
 1. 사용자 입력 (URL, 요청수, 동시성, HTTP 메서드)
@@ -70,7 +70,7 @@
 6. Frontend ResultPanel: 진행률, 성공/실패 수 실시간 표시
 ```
 
-### 2.3 Dependencies
+### 2.3 의존성
 
 | Component | Depends On | Purpose |
 |-----------|-----------|---------|
@@ -81,7 +81,7 @@
 
 ---
 
-## 3. Data Model
+## 3. 데이터 모델
 
 ### 3.1 DTO 정의
 
@@ -163,9 +163,9 @@ CREATE TABLE traffic_history (
 
 ---
 
-## 4. API Specification
+## 4. API 명세
 
-### 4.1 Endpoint List
+### 4.1 엔드포인트 목록
 
 | Method | Path | Description | Auth |
 |--------|------|-------------|------|
@@ -173,7 +173,7 @@ CREATE TABLE traffic_history (
 | GET | /api/traffic/status/{taskId} | 실시간 진행 상태 (SSE) | No |
 | POST | /api/traffic/stop/{taskId} | 트래픽 생성 중지 | No |
 
-### 4.2 Detailed Specification
+### 4.2 상세 명세
 
 #### `POST /api/traffic/start`
 
@@ -249,9 +249,9 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 
 ---
 
-## 5. UI/UX Design
+## 5. UI/UX 설계
 
-### 5.1 Screen Layout
+### 5.1 화면 레이아웃
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -278,13 +278,13 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 └──────────────────────────────────────────────────────┘
 ```
 
-### 5.2 User Flow
+### 5.2 사용자 흐름
 
 ```
 설정 입력 → [Start] 클릭 → 실시간 진행률 표시 → 완료/중지
 ```
 
-### 5.3 Component List
+### 5.3 컴포넌트 목록
 
 | Component | Location | Responsibility |
 |-----------|----------|----------------|
@@ -296,9 +296,9 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 
 ---
 
-## 6. Error Handling
+## 6. 에러 처리
 
-### 6.1 Backend Error Handling
+### 6.1 백엔드 에러 처리
 
 | Code | Message | Cause | Handling |
 |------|---------|-------|----------|
@@ -308,7 +308,7 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 | 429 | Too many tasks | 동시 작업 수 초과 | 재시도 안내 메시지 |
 | 500 | Internal error | 서버 내부 오류 | 로그 기록 및 일반 에러 메시지 |
 
-### 6.2 Error Response Format
+### 6.2 에러 응답 포맷
 
 ```json
 {
@@ -320,7 +320,7 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 }
 ```
 
-### 6.3 Frontend Error Handling
+### 6.3 프론트엔드 에러 처리
 
 | Scenario | Handling |
 |----------|----------|
@@ -330,7 +330,7 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 
 ---
 
-## 7. Security Considerations
+## 7. 보안 고려사항
 
 - [x] URL 입력값 검증 (XSS 방지, 프로토콜 제한: http/https만 허용)
 - [ ] Rate Limiting: 동시 작업 최대 5개, IP당 분당 10회 요청 제한
@@ -340,9 +340,9 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 
 ---
 
-## 8. Test Plan
+## 8. 테스트 계획
 
-### 8.1 Test Scope
+### 8.1 테스트 범위
 
 | Type | Target | Tool |
 |------|--------|------|
@@ -350,7 +350,7 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 | Integration Test | API endpoints | Spring MockMvc |
 | Frontend Test | 컴포넌트 렌더링, 폼 검증 | React Testing Library |
 
-### 8.2 Test Cases (Key)
+### 8.2 주요 테스트 케이스
 
 - [ ] Happy path: URL 입력 → 1000건 요청 → 완료까지 진행률 100%
 - [ ] 중지: 실행 중 Stop → 상태 STOPPED 전환 확인
@@ -360,9 +360,9 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 
 ---
 
-## 9. Clean Architecture
+## 9. 클린 아키텍처
 
-### 9.1 Backend Layer Structure
+### 9.1 백엔드 레이어 구조
 
 | Layer | Responsibility | Location |
 |-------|---------------|----------|
@@ -373,7 +373,7 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 | **Config** | CORS 등 설정 | `config/` |
 | **Exception** | 글로벌 에러 핸들링 | `exception/` |
 
-### 9.2 Frontend Layer Structure
+### 9.2 프론트엔드 레이어 구조
 
 | Layer | Responsibility | Location |
 |-------|---------------|----------|
@@ -383,7 +383,7 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 
 ---
 
-## 10. Coding Convention
+## 10. 코딩 컨벤션
 
 ### 10.1 Backend (Java/Spring)
 
@@ -407,9 +407,9 @@ data: {"taskId":"550e...","totalRequests":1000,"completedRequests":1000,"success
 
 ---
 
-## 11. Implementation Guide
+## 11. 구현 가이드
 
-### 11.1 Backend File Structure
+### 11.1 백엔드 파일 구조
 
 ```
 backend/
@@ -435,7 +435,7 @@ backend/
 └── settings.gradle
 ```
 
-### 11.2 Frontend File Structure
+### 11.2 프론트엔드 파일 구조
 
 ```
 frontend/
@@ -458,7 +458,7 @@ frontend/
 └── .env
 ```
 
-### 11.3 Implementation Order
+### 11.3 구현 순서
 
 1. [ ] **Backend 프로젝트 초기화**: Spring Boot + Gradle 세팅
 2. [ ] **DTO 정의**: TrafficRequest, TrafficResponse, TrafficProgress
@@ -476,7 +476,7 @@ frontend/
 
 ---
 
-## Version History
+## 변경 이력
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|

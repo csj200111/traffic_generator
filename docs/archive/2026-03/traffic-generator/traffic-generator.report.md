@@ -1,4 +1,4 @@
-# Traffic Generator - PDCA Completion Report
+# Traffic Generator - 프로젝트 완료 보고서
 
 > **Project**: traffic-generator
 > **Version**: 0.1.0
@@ -8,9 +8,9 @@
 
 ---
 
-## 1. Executive Summary
+## 1. 요약
 
-개발자 포트폴리오 면접에서 트래픽 대응 경험을 시연하기 위한 **Traffic Generator** 웹서비스를 Plan → Design → Do → Check → Act 사이클을 통해 성공적으로 개발 완료했다.
+개발자 포트폴리오 면접에서 트래픽 대응 경험을 시연하기 위한 **Traffic Generator** 웹서비스를 기획 → 설계 → 구현 → 검증 → 개선 사이클을 통해 성공적으로 개발 완료했다.
 
 - **기술스택**: React (Vite) + Spring Boot (Java 24) + Gradle 8.14
 - **핵심 기능**: URL 지정 → 트래픽 수치 설정 → 버튼 클릭으로 대량 HTTP 요청 발생 → SSE 실시간 모니터링
@@ -18,7 +18,7 @@
 
 ---
 
-## 2. PDCA Cycle Summary
+## 2. 개발 사이클 요약
 
 | Phase | Status | Date | Output |
 |-------|:------:|------|--------|
@@ -34,7 +34,7 @@
 
 ---
 
-## 3. Requirements Fulfillment
+## 3. 요구사항 달성 현황
 
 | ID | Requirement | Status |
 |----|-------------|:------:|
@@ -50,7 +50,7 @@
 
 ---
 
-## 4. Architecture Overview
+## 4. 아키텍처 개요
 
 ```
 ┌──────────────────┐         ┌──────────────────────────────┐
@@ -64,7 +64,7 @@
 └──────────────────┘         └──────────────────────────────┘
 ```
 
-### Tech Stack
+### 기술 스택
 
 | Layer | Technology | Version |
 |-------|-----------|---------|
@@ -76,7 +76,7 @@
 
 ---
 
-## 5. Implementation Details
+## 5. 구현 상세
 
 ### 5.1 Backend (11 files)
 
@@ -110,7 +110,7 @@
 | `index.html` | HTML 템플릿 |
 | `vite.config.js` | Vite 설정 (프록시 포함) |
 
-### 5.3 API Endpoints
+### 5.3 API 엔드포인트
 
 | Method | Path | Description |
 |--------|------|-------------|
@@ -120,9 +120,9 @@
 
 ---
 
-## 6. Gap Analysis & Iteration
+## 6. 갭 분석 및 개선
 
-### 6.1 Initial Check (81%)
+### 6.1 초기 검증 (81%)
 
 | Category | Score |
 |----------|:-----:|
@@ -133,14 +133,14 @@
 | Error Handling | 70% |
 | Convention | 95% |
 
-### 6.2 주요 Gap
+### 6.2 주요 갭
 
 1. GlobalExceptionHandler 누락
 2. 에러 응답 형식 불일치 (429, 409)
 3. RequestBody UI 입력 필드 누락
 4. Design 문서와 구현 간 파일 구조 차이
 
-### 6.3 Iteration 1 수정 내역
+### 6.3 1차 개선 수정 내역
 
 | # | Fix | Impact |
 |---|-----|--------|
@@ -149,11 +149,11 @@
 | 3 | TrafficForm에 RequestBody textarea 추가 | UI/Component 90% → 95% |
 | 4 | Design 문서 6개 항목 동기화 | Architecture 88% → 97% |
 
-### 6.4 Final Score: 93%
+### 6.4 최종 점수: 93%
 
 ---
 
-## 7. Test & Verification
+## 7. 테스트 및 검증
 
 ### 7.1 수동 테스트 결과
 
@@ -174,7 +174,7 @@
 
 ---
 
-## 8. Remaining Items
+## 8. 잔여 항목
 
 | # | Item | Priority | Plan |
 |---|------|----------|------|
@@ -185,18 +185,18 @@
 
 ---
 
-## 9. Lessons Learned
+## 9. 배운 점
 
 | Topic | Lesson |
 |-------|--------|
 | Java 버전 호환성 | Java 24는 Gradle 8.14+ 필요 (8.7, 8.12 모두 실패) |
 | Virtual Thread | Java 21+ Virtual Thread가 기존 스레드풀보다 간결하고 효율적 |
 | SSE vs WebSocket | 서버→클라이언트 단방향 스트림에는 SSE가 WebSocket보다 적합 |
-| PDCA 효과 | Design 문서 기반 개발로 구조적 누락 방지, Gap 분석으로 품질 보장 |
+| 문서 기반 개발 | 설계 문서 기반 개발로 구조적 누락 방지, 갭 분석으로 품질 보장 |
 
 ---
 
-## 10. How to Run
+## 10. 실행 방법
 
 ```bash
 # Backend
@@ -213,8 +213,8 @@ npm run dev
 
 ---
 
-## Version History
+## 변경 이력
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 0.1 | 2026-03-21 | PDCA 완료 보고서 | csj20 |
+| 0.1 | 2026-03-21 | 프로젝트 완료 보고서 | csj20 |

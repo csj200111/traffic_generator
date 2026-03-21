@@ -1,16 +1,16 @@
-# Traffic Generator Analysis Report
+# Traffic Generator 분석 보고서
 
 > **Analysis Type**: Gap Analysis (Design vs Implementation)
 >
 > **Project**: traffic-generator
 > **Version**: 0.1.0
-> **Analyst**: Claude (gap-detector)
+> **Analyst**: csj20
 > **Date**: 2026-03-21
 > **Design Doc**: [traffic-generator.design.md](../02-design/features/traffic-generator.design.md)
 
 ---
 
-## 1. Overall Scores
+## 1. 종합 점수
 
 | Category | Score | Status |
 |----------|:-----:|:------:|
@@ -25,7 +25,7 @@
 
 ---
 
-## 2. Missing Features (Design O, Implementation X)
+## 2. 미구현 항목 (설계 O, 구현 X)
 
 | # | Item | Description | Priority |
 |---|------|-------------|----------|
@@ -35,7 +35,7 @@
 | 4 | Test Cases | Unit/Integration/Frontend 테스트 전무 | LOW |
 | 5 | Headers/RequestBody UI | 커스텀 헤더, 요청 본문 입력 UI 누락 | MEDIUM |
 
-## 3. Changed Features (Design != Implementation)
+## 3. 변경된 항목 (설계 != 구현)
 
 | # | Item | Design | Implementation | Impact |
 |---|------|--------|----------------|--------|
@@ -45,7 +45,7 @@
 | 4 | 400 에러 형식 | 커스텀 에러 포맷 | Spring 기본 validation 포맷 | Medium |
 | 5 | Thread 모델 | AsyncConfig + @Async | Virtual Thread + Semaphore | Low (개선) |
 
-## 4. Added Features (Design X, Implementation O)
+## 4. 추가된 항목 (설계 X, 구현 O)
 
 | # | Item | Description |
 |---|------|-------------|
@@ -53,25 +53,25 @@
 | 2 | Virtual Threads | 기존 스레드풀 대신 Virtual Thread 사용 |
 | 3 | SSE Scheduler | ScheduledExecutorService로 주기적 SSE 푸시 |
 
-## 5. Recommended Actions
+## 5. 권장 조치사항
 
-### HIGH Priority
+### 높은 우선순위
 1. **GlobalExceptionHandler 추가** - `@ControllerAdvice`로 에러 응답 형식 통일
 2. **429 에러 응답 형식 변경** - TrafficResponse 대신 Design의 error format 사용
 
-### MEDIUM Priority
+### 중간 우선순위
 3. **Headers/RequestBody UI** - POST/PUT 선택 시 입력 필드 표시
 4. **IP-based Rate Limiting** - Spring Interceptor/Filter로 구현
 
-### LOW Priority (Design 문서 업데이트 권장)
+### 낮은 우선순위 (설계 문서 업데이트 권장)
 5. Virtual Thread 방식 반영
 6. SSE error event 방식 반영
 7. Entry point `main.jsx` 반영
 
 ---
 
-## Version History
+## 변경 이력
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 0.1 | 2026-03-21 | Initial gap analysis | Claude (gap-detector) |
+| 0.1 | 2026-03-21 | Initial gap analysis | csj20 |

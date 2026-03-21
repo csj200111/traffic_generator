@@ -1,4 +1,4 @@
-# Traffic Generator Planning Document
+# Traffic Generator 기획 문서
 
 > **Summary**: 특정 URL에 설정된 수치만큼 트래픽을 발생시키는 웹서비스
 >
@@ -10,34 +10,34 @@
 
 ---
 
-## 1. Overview
+## 1. 개요
 
-### 1.1 Purpose
+### 1.1 목적
 
 개발자 포트폴리오 면접에서 트래픽 대응 관련 질문이 빈번하다. 이를 실제로 시연할 수 있도록, 특정 URL에 원하는 수치만큼의 트래픽을 발생시키는 웹서비스를 개발한다.
 
-### 1.2 Background
+### 1.2 배경
 
 - 개발자 면접에서 트래픽 대응 경험을 증명할 수단이 필요
 - 사용자가 직접 트래픽 수치를 설정하고, 버튼 하나로 트래픽을 발생시킬 수 있는 도구가 필요
 - 배포 가능한 수준으로 완성하여 실제 시연 가능해야 함
 
-### 1.3 Related Documents
+### 1.3 관련 문서
 
 - Requirements: `basic.md` (프로젝트 루트)
 
 ---
 
-## 2. Scope
+## 2. 범위
 
-### 2.1 In Scope
+### 2.1 포함 범위
 
 - [ ] 트래픽 설정 UI (대상 URL, 요청 수, 동시 접속 수 등)
 - [ ] 설정된 수치에 따른 HTTP 트래픽 발생 백엔드 API
 - [ ] 트래픽 발생 상태 실시간 모니터링 (진행률, 성공/실패 수)
 - [ ] 배포 가능한 수준의 빌드 및 설정
 
-### 2.2 Out of Scope
+### 2.2 제외 범위
 
 - 분산 트래픽 생성 (다중 서버에서의 트래픽 발생)
 - 사용자 인증/로그인 시스템
@@ -45,9 +45,9 @@
 
 ---
 
-## 3. Requirements
+## 3. 요구사항
 
-### 3.1 Functional Requirements
+### 3.1 기능 요구사항
 
 | ID | Requirement | Priority | Status |
 |----|-------------|----------|--------|
@@ -59,7 +59,7 @@
 | FR-06 | 트래픽 발생 중 진행 상태(진행률, 성공/실패 수)를 실시간 표시한다 | High | Pending |
 | FR-07 | 트래픽 발생을 중간에 중지할 수 있다 | Medium | Pending |
 
-### 3.2 Non-Functional Requirements
+### 3.2 비기능 요구사항
 
 | Category | Criteria | Measurement Method |
 |----------|----------|-------------------|
@@ -69,16 +69,16 @@
 
 ---
 
-## 4. Success Criteria
+## 4. 성공 기준
 
-### 4.1 Definition of Done
+### 4.1 완료 기준
 
 - [ ] 모든 기능 요구사항(FR-01~FR-07) 구현 완료
 - [ ] 프론트엔드-백엔드 연동 정상 동작
 - [ ] 배포 가능한 상태로 빌드 성공
 - [ ] 기본적인 에러 처리 완료
 
-### 4.2 Quality Criteria
+### 4.2 품질 기준
 
 - [ ] 프론트엔드 빌드 에러 없음
 - [ ] 백엔드 빌드 및 실행 에러 없음
@@ -86,7 +86,7 @@
 
 ---
 
-## 5. Risks and Mitigation
+## 5. 리스크 및 대응 방안
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
@@ -96,17 +96,9 @@
 
 ---
 
-## 6. Architecture Considerations
+## 6. 아키텍처 설계
 
-### 6.1 Project Level Selection
-
-| Level | Characteristics | Recommended For | Selected |
-|-------|-----------------|-----------------|:--------:|
-| **Starter** | Simple structure | Static sites, portfolios | ☐ |
-| **Dynamic** | Feature-based modules, BaaS integration | Web apps with backend | ☒ |
-| **Enterprise** | Strict layer separation, microservices | High-traffic systems | ☐ |
-
-### 6.2 Key Architectural Decisions
+### 6.1 주요 아키텍처 결정사항
 
 | Decision | Options | Selected | Rationale |
 |----------|---------|----------|-----------|
@@ -118,11 +110,9 @@
 | Frontend-Backend 통신 | REST API | REST API | 단순한 요청-응답 구조에 적합 |
 | 실시간 상태 전달 | Polling / SSE / WebSocket | SSE | 서버→클라이언트 단방향 스트림에 적합 |
 
-### 6.3 Clean Architecture Approach
+### 6.2 클린 아키텍처 구조
 
 ```
-Selected Level: Dynamic
-
 Folder Structure Preview:
 ┌─────────────────────────────────────────────────────┐
 │ Frontend (React):                                   │
@@ -142,15 +132,14 @@ Folder Structure Preview:
 
 ---
 
-## 7. Convention Prerequisites
+## 7. 컨벤션 사전 준비
 
-### 7.1 Existing Project Conventions
+### 7.1 기존 프로젝트 컨벤션
 
-- [ ] `CLAUDE.md` has coding conventions section
 - [ ] ESLint configuration (`.eslintrc.*`)
 - [ ] Prettier configuration (`.prettierrc`)
 
-### 7.2 Conventions to Define/Verify
+### 7.2 정의/검증이 필요한 컨벤션
 
 | Category | Current State | To Define | Priority |
 |----------|---------------|-----------|:--------:|
@@ -159,7 +148,7 @@ Folder Structure Preview:
 | **API 설계** | missing | RESTful API 네이밍 규칙 | High |
 | **Error handling** | missing | 공통 에러 응답 포맷 | Medium |
 
-### 7.3 Environment Variables Needed
+### 7.3 필요 환경변수
 
 | Variable | Purpose | Scope | To Be Created |
 |----------|---------|-------|:-------------:|
@@ -169,7 +158,7 @@ Folder Structure Preview:
 
 ---
 
-## 8. Next Steps
+## 8. 다음 단계
 
 1. [ ] Design 문서 작성 (`traffic-generator.design.md`)
 2. [ ] 프론트엔드/백엔드 프로젝트 초기 세팅
@@ -178,7 +167,7 @@ Folder Structure Preview:
 
 ---
 
-## Version History
+## 변경 이력
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
