@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: traffic-generator
+
+traffic:
+  max-concurrent-tasks: 5
+  max-total-requests: 10000
+  max-concurrency: 500
+  thread-pool:
+    core-size: 10
+    max-size: 50
+    queue-capacity: 100
