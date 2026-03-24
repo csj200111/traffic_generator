@@ -74,6 +74,7 @@ export default function TrafficForm({ onStart, onStop, isRunning }) {
           <option value="GET">GET</option>
           <option value="POST">POST</option>
           <option value="PUT">PUT</option>
+          <option value="PATCH">PATCH</option>
           <option value="DELETE">DELETE</option>
         </select>
       </div>
@@ -108,7 +109,7 @@ export default function TrafficForm({ onStart, onStop, isRunning }) {
         </div>
       </div>
 
-      {(config.httpMethod === 'POST' || config.httpMethod === 'PUT') && (
+      {(config.httpMethod === 'POST' || config.httpMethod === 'PUT' || config.httpMethod === 'PATCH') && (
         <div className="form-group">
           <label htmlFor="requestBody">Request Body</label>
           <textarea
@@ -126,7 +127,7 @@ export default function TrafficForm({ onStart, onStop, isRunning }) {
         {!isRunning ? (
           <button type="submit" className="btn btn-start">Start</button>
         ) : (
-          <button type="button" className="btn btn-stop" onClick={onStop}>Stop</button>
+          <button type="button" className="btn btn-running" onClick={onStop}>Running..</button>
         )}
       </div>
     </form>

@@ -65,7 +65,7 @@ export default function App() {
 
         <section className="section">
           <h2>Results</h2>
-          <ResultPanel progress={progress} />
+          <ResultPanel progress={progress} isRunning={isRunning} />
         </section>
       </main>
 

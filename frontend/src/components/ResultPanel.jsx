@@ -7,11 +7,11 @@ function formatTime(ms) {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-export default function ResultPanel({ progress }) {
+export default function ResultPanel({ progress, isRunning }) {
   if (!progress) {
     return (
       <div className="result-panel result-panel-empty">
-        <p>트래픽을 설정하고 Start 버튼을 눌러주세요.</p>
+        <p>Start 버튼을 눌러 트래픽을 생성하세요.</p>
       </div>
     );
   }
@@ -19,16 +19,14 @@ export default function ResultPanel({ progress }) {
   return (
     <div className="result-panel">
       <div className="result-header">
-        <span>Status:</span>
+        <span className="result-header-label">Status</span>
         <StatusBadge status={progress.status} />
       </div>
 
-      <ProgressBar value={progress.progressRate} />
+      <ProgressBar value={progress.progressRate} status={progress.status} />
 
       <div className="result-details">
-        <span className="result-completed">
-          {progress.completedRequests} / {progress.totalRequests}
-        </span>
+        {progress.completedRequests} / {progress.totalRequests}
       </div>
 
       <div className="result-stats">

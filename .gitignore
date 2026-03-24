@@ -37,6 +37,9 @@ docs/.pdca-status.json
 # === Report ===
 report/
 
+# === Design ===
+design/
+
 # === Claude Code ===
 .claude/
 CLAUDE.md
