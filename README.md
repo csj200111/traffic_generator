@@ -5,16 +5,21 @@
 
 ## 주요 기능
 
-- URL, HTTP 메서드, 요청 수, 동시 접속 수 설정
-- 버튼 클릭으로 대량 HTTP 트래픽 발생
+- URL, HTTP 메서드(GET/POST/PUT/DELETE), 요청 수, 동시 접속 수 설정
+- 커스텀 헤더 및 요청 본문(Body) 설정
+- Ramp-up 모드: 단계적으로 부하를 증가시키는 점진적 트래픽 생성
 - SSE(Server-Sent Events) 기반 실시간 진행률 모니터링
+- 응답 시간 분석: Min, Avg, P95, P99, Max 퍼센타일
+- TPS(초당 처리량) 추이 차트
+- HTTP 상태 코드 분포(2xx/3xx/4xx/5xx) 시각화
 - 실행 중 트래픽 중지 기능
+- 최대 5개 동시 작업 지원
 
 ## 기술 스택
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18, Vite 5, JavaScript |
+| Frontend | React 18.3, Vite 5.4, Recharts 3.8, JavaScript |
 | Backend | Spring Boot 3.2.5, Java 17+ |
 | Build | Gradle 8.14 |
 | Realtime | SSE (Server-Sent Events) |
@@ -26,17 +31,28 @@
 traffic_generator/
 ├── backend/                          # Spring Boot
 │   └── src/main/java/com/traffic/generator/
-│       ├── controller/               # REST API + SSE
-│       ├── service/                  # 작업 관리
-│       ├── executor/                 # 비동기 HTTP 요청 실행
-│       ├── dto/                      # 데이터 전송 객체
-│       ├── config/                   # CORS 설정
-│       └── exception/                # 글로벌 에러 핸들링
+│       ├── controller/               # REST API + SSE 스트리밍
+│       ├── service/                  # 작업 생명주기 관리
+│       ├── executor/                 # 비동기 HTTP 요청 실행 (Flat/Ramp-up)
+│       ├── dto/                      # Request, Response, Progress DTO
+│       ├── config/                   # CORS, Thread Pool 설정
+│       └── exception/                # 글로벌 예외 핸들링
 ├── frontend/                         # React (Vite)
 │   └── src/
-│       ├── components/               # UI 컴포넌트
-│       ├── hooks/                    # SSE 연결 훅
-│       └── services/                 # API 호출
+│       ├── App.jsx                   # 메인 애플리케이션
+│       ├── components/
+│       │   ├── TrafficForm.jsx       # 트래픽 설정 입력 폼
+│       │   ├── ResultPanel.jsx       # 결과 대시보드
+│       │   ├── TpsChart.jsx          # TPS 추이 라인 차트
+│       │   ├── LatencyChart.jsx      # 응답 시간 바 차트
+│       │   ├── StatusCodeChart.jsx   # 상태 코드 도넛 차트
+│       │   ├── ProgressBar.jsx       # 진행률 표시
+│       │   └── StatusBadge.jsx       # 상태 배지
+│       ├── hooks/
+│       │   └── useTrafficSSE.js      # SSE 연결 관리 훅
+│       └── services/
+│           └── trafficApi.js         # API 호출 클라이언트
+├── test-server.js                    # Node.js 테스트 서버 (port 9090)
 └── docs/                             # PDCA 문서
 ```
 
@@ -54,6 +70,8 @@ cd backend
 ./gradlew bootRun
 ```
 
+서버가 `http://localhost:8080`에서 실행됩니다.
+
 ### Frontend
 
 ```bash
@@ -64,6 +82,16 @@ npm run dev
 
 브라우저에서 `http://localhost:3000` 접속
 
+### 테스트 서버 (선택)
+
+트래픽을 보낼 대상 서버가 없을 경우, 내장 테스트 서버를 사용할 수 있습니다.
+
+```bash
+node test-server.js
+```
+
+`http://localhost:9090`에서 테스트 서버가 실행됩니다 (5% 확률로 에러 응답 시뮬레이션).
+
 ## API 엔드포인트
 
 | Method | Path | Description |
@@ -72,11 +100,48 @@ npm run dev
 | GET | `/api/traffic/status/{taskId}` | 실시간 진행 상태 (SSE) |
 | POST | `/api/traffic/stop/{taskId}` | 트래픽 중지 |
 
+### 요청 파라미터 (POST /api/traffic/start)
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|---------|------|------|------|
+| targetUrl | String | O | 대상 URL (http/https) |
+| httpMethod | String | O | GET, POST, PUT, DELETE |
+| totalRequests | Integer | O | 총 요청 수 (1~10,000) |
+| concurrency | Integer | O | 동시 접속 수 (1~500) |
+| headers | Map | X | 커스텀 헤더 |
+| requestBody | String | X | 요청 본문 (POST/PUT) |
+| rampUp | Boolean | X | Ramp-up 모드 활성화 |
+| rampUpSteps | Integer | X | Ramp-up 단계 수 (2~10) |
+
+### 응답 메트릭
+
+- 진행률 (0~100%)
+- 성공/실패 횟수
+- 경과 시간 (ms)
+- 응답 시간: Min, Avg, P95, P99, Max
+- HTTP 상태 코드 분포 (2xx/3xx/4xx/5xx)
+- TPS (초당 처리량) 추이
+- 현재 동시 접속 수
+
 ## 사용 예시
 
-1. Target URL에 테스트할 서버 주소 입력 (예: `https://httpbin.org/get`)
+1. Target URL에 테스트할 서버 주소 입력 (예: `http://localhost:9090`)
 2. HTTP Method, Total Requests, Concurrency 설정
-3. **Start** 클릭
-4. 진행률, 성공/실패 수, 소요 시간을 실시간으로 확인
+3. (선택) Ramp-up 모드 활성화 및 단계 설정
+4. **Start** 클릭
+5. 실시간 대시보드에서 진행률, 성공/실패 수, TPS, 응답 시간, 상태 코드 분포 확인
+
+## 설정값
+
+| 항목 | 기본값 |
+|------|--------|
+| Thread Pool Core | 10 |
+| Thread Pool Max | 50 |
+| Thread Pool Queue | 100 |
+| 최대 동시 작업 수 | 5 |
+| 최대 총 요청 수 | 10,000 |
+| 최대 동시 접속 수 | 500 |
+| 요청 타임아웃 | 30초 |
+| SSE 타임아웃 | 5분 |
 
 > **주의**: 본 서비스는 자신의 서버 테스트 용도로만 사용하세요.
