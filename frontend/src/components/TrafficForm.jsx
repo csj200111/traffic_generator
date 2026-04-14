@@ -7,6 +7,8 @@ const DEFAULT_CONFIG = {
   httpMethod: 'GET',
   headers: {},
   requestBody: '',
+  rampUp: false,
+  rampUpSteps: 5,
 };
 
 export default function TrafficForm({ onStart, onStop, isRunning }) {
@@ -122,6 +124,35 @@ export default function TrafficForm({ onStart, onStop, isRunning }) {
           />
         </div>
       )}
+
+      <div className="ramp-up-section">
+        <label className="toggle-label">
+          <input
+            type="checkbox"
+            checked={config.rampUp}
+            onChange={(e) => handleChange('rampUp', e.target.checked)}
+            disabled={isRunning}
+          />
+          <span className="toggle-text">Ramp-up (점진적 부하 증가)</span>
+        </label>
+        {config.rampUp && (
+          <div className="form-group ramp-up-detail">
+            <label htmlFor="rampUpSteps">Steps</label>
+            <input
+              id="rampUpSteps"
+              type="number"
+              min="2"
+              max="10"
+              value={config.rampUpSteps}
+              onChange={(e) => handleChange('rampUpSteps', parseInt(e.target.value) || 2)}
+              disabled={isRunning}
+            />
+            <span className="ramp-up-desc">
+              {config.rampUpSteps}단계로 동시접속을 {Math.ceil(config.concurrency / config.rampUpSteps)} → {config.concurrency}까지 증가
+            </span>
+          </div>
+        )}
+      </div>
 
       <div className="form-actions">
         {!isRunning ? (

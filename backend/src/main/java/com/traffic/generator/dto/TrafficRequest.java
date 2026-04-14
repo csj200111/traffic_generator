@@ -32,6 +32,12 @@ public class TrafficRequest {
 
     private String requestBody;
 
+    private boolean rampUp = false;
+
+    @Min(value = 2, message = "Ramp-up 단계는 최소 2입니다.")
+    @Max(value = 10, message = "Ramp-up 단계는 최대 10입니다.")
+    private int rampUpSteps = 5;
+
     public String getTargetUrl() {
         return targetUrl;
     }
@@ -78,5 +84,21 @@ public class TrafficRequest {
 
     public void setRequestBody(String requestBody) {
         this.requestBody = requestBody;
+    }
+
+    public boolean isRampUp() {
+        return rampUp;
+    }
+
+    public void setRampUp(boolean rampUp) {
+        this.rampUp = rampUp;
+    }
+
+    public int getRampUpSteps() {
+        return rampUpSteps;
+    }
+
+    public void setRampUpSteps(int rampUpSteps) {
+        this.rampUpSteps = rampUpSteps;
     }
 }

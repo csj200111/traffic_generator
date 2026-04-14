@@ -350,6 +350,105 @@ body {
   text-underline-offset: 3px;
 }
 
+/* Latency Stats */
+.result-latency-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.stat-latency {
+  text-align: center;
+  padding: 12px 8px;
+  background: #232f3e;
+  border-radius: 8px;
+}
+
+.stat-value-warning {
+  color: #f59e0b !important;
+}
+
+.stat-value-danger {
+  color: #ef4444 !important;
+}
+
+.stat-value-tps {
+  color: #3b82f6 !important;
+}
+
+/* Charts Section */
+.charts-section {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chart-container {
+  background: #232f3e;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.chart-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b8aab;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.chart-subtitle {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-left: 8px;
+}
+
+/* Ramp-up Section */
+.ramp-up-section {
+  background: #232f3e;
+  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1px solid #3a4a5e;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.toggle-label input[type="checkbox"] {
+  accent-color: #3b82f6;
+  width: 16px;
+  height: 16px;
+}
+
+.toggle-text {
+  color: #c0ccda;
+  font-weight: 500;
+}
+
+.ramp-up-detail {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #3a4a5e;
+}
+
+.ramp-up-detail input {
+  width: 80px;
+}
+
+.ramp-up-desc {
+  font-size: 11px;
+  color: #6b8aab;
+  margin-top: 4px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app {
@@ -359,5 +458,9 @@ body {
   .app-main {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  .result-latency-stats {
+    grid-template-columns: 1fr 1fr;
   }
 }

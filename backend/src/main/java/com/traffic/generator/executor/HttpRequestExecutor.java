@@ -34,49 +34,24 @@ public class HttpRequestExecutor {
     public void execute(TrafficRequest request, TrafficProgress progress, AtomicBoolean cancelled) {
         int totalRequests = request.getTotalRequests();
         int concurrency = request.getConcurrency();
-        Semaphore semaphore = new Semaphore(concurrency);
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+        boolean rampUp = request.isRampUp();
+        int rampUpSteps = request.getRampUpSteps();
+
+        ExecutorService executor = Executors.newCachedThreadPool();
         long startTime = System.currentTimeMillis();
 
         try {
-            for (int i = 0; i < totalRequests; i++) {
-                if (cancelled.get()) {
-                    progress.setStatus("STOPPED");
-                    break;
-                }
-
-                semaphore.acquire();
-                executor.submit(() -> {
-                    try {
-                        if (cancelled.get()) {
-                            return;
-                        }
-                        sendRequest(request);
-                        synchronized (progress) {
-                            progress.incrementSuccess();
-                            progress.setElapsedTimeMs(System.currentTimeMillis() - startTime);
-                        }
-                    } catch (Exception e) {
-                        synchronized (progress) {
-                            progress.incrementFail();
-                            progress.setElapsedTimeMs(System.currentTimeMillis() - startTime);
-                        }
-                        log.debug("Request failed: {}", e.getMessage());
-                    } finally {
-                        semaphore.release();
-                    }
-                });
-            }
-
-            // 모든 요청 완료 대기
-            for (int i = 0; i < concurrency; i++) {
-                semaphore.acquire();
+            if (rampUp && rampUpSteps > 1) {
+                executeWithRampUp(request, progress, cancelled, executor, startTime, totalRequests, concurrency, rampUpSteps);
+            } else {
+                executeFlat(request, progress, cancelled, executor, startTime, totalRequests, concurrency);
             }
 
             if (!cancelled.get()) {
                 progress.setStatus("COMPLETED");
             }
             progress.setElapsedTimeMs(System.currentTimeMillis() - startTime);
+            progress.updateTps(startTime);
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -86,19 +61,89 @@ public class HttpRequestExecutor {
         }
     }
 
-    private void sendRequest(TrafficRequest request) throws Exception {
+    private void executeFlat(TrafficRequest request, TrafficProgress progress, AtomicBoolean cancelled,
+                             ExecutorService executor, long startTime, int totalRequests, int concurrency) throws InterruptedException {
+        Semaphore semaphore = new Semaphore(concurrency);
+        progress.setCurrentConcurrency(concurrency);
+
+        sendBatch(request, progress, cancelled, executor, semaphore, startTime, totalRequests);
+        waitForCompletion(semaphore, concurrency);
+    }
+
+    private void executeWithRampUp(TrafficRequest request, TrafficProgress progress, AtomicBoolean cancelled,
+                                   ExecutorService executor, long startTime, int totalRequests, int maxConcurrency, int steps) throws InterruptedException {
+        int requestsPerStep = totalRequests / steps;
+        int remainingRequests = totalRequests;
+
+        for (int step = 1; step <= steps && !cancelled.get(); step++) {
+            int stepConcurrency = (int) Math.ceil((double) maxConcurrency * step / steps);
+            int stepRequests = (step == steps) ? remainingRequests : requestsPerStep;
+            remainingRequests -= stepRequests;
+
+            Semaphore semaphore = new Semaphore(stepConcurrency);
+            progress.setCurrentConcurrency(stepConcurrency);
+            log.info("Ramp-up step {}/{}: concurrency={}, requests={}", step, steps, stepConcurrency, stepRequests);
+
+            sendBatch(request, progress, cancelled, executor, semaphore, startTime, stepRequests);
+            waitForCompletion(semaphore, stepConcurrency);
+        }
+    }
+
+    private void sendBatch(TrafficRequest request, TrafficProgress progress, AtomicBoolean cancelled,
+                           ExecutorService executor, Semaphore semaphore, long startTime, int count) throws InterruptedException {
+        for (int i = 0; i < count; i++) {
+            if (cancelled.get()) {
+                progress.setStatus("STOPPED");
+                break;
+            }
+
+            semaphore.acquire();
+            executor.submit(() -> {
+                try {
+                    if (cancelled.get()) return;
+
+                    long reqStart = System.currentTimeMillis();
+                    int statusCode = sendRequest(request);
+                    long responseTime = System.currentTimeMillis() - reqStart;
+
+                    synchronized (progress) {
+                        progress.incrementSuccess();
+                        progress.recordResponseTime(responseTime);
+                        progress.recordStatusCode(statusCode);
+                        progress.setElapsedTimeMs(System.currentTimeMillis() - startTime);
+                        progress.updateTps(startTime);
+                    }
+                } catch (Exception e) {
+                    synchronized (progress) {
+                        progress.incrementFail();
+                        progress.setElapsedTimeMs(System.currentTimeMillis() - startTime);
+                        progress.updateTps(startTime);
+                    }
+                    log.warn("Request failed: {}", e.getMessage());
+                } finally {
+                    semaphore.release();
+                }
+            });
+        }
+    }
+
+    private void waitForCompletion(Semaphore semaphore, int permits) throws InterruptedException {
+        for (int i = 0; i < permits; i++) {
+            semaphore.acquire();
+        }
+    }
+
+    private int sendRequest(TrafficRequest request) throws Exception {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(request.getTargetUrl()))
                 .timeout(REQUEST_TIMEOUT);
 
-        // 커스텀 헤더 추가
         if (request.getHeaders() != null) {
             for (Map.Entry<String, String> entry : request.getHeaders().entrySet()) {
                 builder.header(entry.getKey(), entry.getValue());
             }
         }
 
-        // HTTP 메서드에 따른 요청 생성
         HttpRequest httpRequest = switch (request.getHttpMethod().toUpperCase()) {
             case "POST" -> builder.POST(bodyPublisher(request.getRequestBody())).build();
             case "PUT" -> builder.PUT(bodyPublisher(request.getRequestBody())).build();
@@ -106,7 +151,8 @@ public class HttpRequestExecutor {
             default -> builder.GET().build();
         };
 
-        httpClient.send(httpRequest, HttpResponse.BodyHandlers.discarding());
+        HttpResponse<Void> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.discarding());
+        return response.statusCode();
     }
 
     private HttpRequest.BodyPublisher bodyPublisher(String body) {

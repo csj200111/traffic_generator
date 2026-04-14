@@ -1,6 +1,9 @@
 import React from 'react';
 import ProgressBar from './ProgressBar';
 import StatusBadge from './StatusBadge';
+import TpsChart from './TpsChart';
+import LatencyChart from './LatencyChart';
+import StatusCodeChart from './StatusCodeChart';
 
 function formatTime(ms) {
   if (ms < 1000) return `${ms}ms`;
@@ -42,6 +45,39 @@ export default function ResultPanel({ progress, isRunning }) {
           <span className="stat-label">Time</span>
           <span className="stat-value">{formatTime(progress.elapsedTimeMs)}</span>
         </div>
+      </div>
+
+      {(progress.avgResponseTimeMs > 0 || progress.p95ResponseTimeMs > 0) && (
+        <div className="result-latency-stats">
+          <div className="stat stat-latency">
+            <span className="stat-label">Avg</span>
+            <span className="stat-value">{Math.round(progress.avgResponseTimeMs)}ms</span>
+          </div>
+          <div className="stat stat-latency">
+            <span className="stat-label">P95</span>
+            <span className="stat-value stat-value-warning">{Math.round(progress.p95ResponseTimeMs)}ms</span>
+          </div>
+          <div className="stat stat-latency">
+            <span className="stat-label">P99</span>
+            <span className="stat-value stat-value-danger">{Math.round(progress.p99ResponseTimeMs)}ms</span>
+          </div>
+          <div className="stat stat-latency">
+            <span className="stat-label">TPS</span>
+            <span className="stat-value stat-value-tps">{Math.round(progress.currentTps)}</span>
+          </div>
+        </div>
+      )}
+
+      <div className="charts-section">
+        <TpsChart tpsHistory={progress.tpsHistory} currentConcurrency={progress.currentConcurrency} />
+        <LatencyChart
+          avgResponseTimeMs={progress.avgResponseTimeMs}
+          minResponseTimeMs={progress.minResponseTimeMs}
+          maxResponseTimeMs={progress.maxResponseTimeMs}
+          p95ResponseTimeMs={progress.p95ResponseTimeMs}
+          p99ResponseTimeMs={progress.p99ResponseTimeMs}
+        />
+        <StatusCodeChart statusCodeCounts={progress.statusCodeCounts} />
       </div>
     </div>
   );
