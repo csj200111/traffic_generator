@@ -4,6 +4,7 @@ import StatusBadge from './StatusBadge';
 import TpsChart from './TpsChart';
 import LatencyChart from './LatencyChart';
 import StatusCodeChart from './StatusCodeChart';
+import AnalysisSummary from './AnalysisSummary';
 
 function formatTime(ms) {
   if (ms < 1000) return `${ms}ms`;
@@ -79,6 +80,10 @@ export default function ResultPanel({ progress, isRunning }) {
         />
         <StatusCodeChart statusCodeCounts={progress.statusCodeCounts} />
       </div>
+
+      {progress.status !== 'RUNNING' && (
+        <AnalysisSummary progress={progress} />
+      )}
     </div>
   );
 }
