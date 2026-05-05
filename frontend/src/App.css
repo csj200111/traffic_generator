@@ -613,6 +613,462 @@ body {
   color: #4a5a6e;
 }
 
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid #2a3a4e;
+  padding-bottom: 0;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b8aab;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: #c0ccda;
+}
+
+.tab-btn.active {
+  color: #60a5fa;
+  border-bottom-color: #3b82f6;
+}
+
+/* Threshold Form */
+.advanced-toggle {
+  background: none;
+  border: 1px solid #3a4a5e;
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.advanced-toggle:hover:not(:disabled) {
+  border-color: #3b82f6;
+  color: #c0ccda;
+}
+
+.advanced-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.advanced-fields {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #3a4a5e;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.threshold-estimate {
+  font-size: 12px;
+  color: #6b8aab;
+  background: #1a2332;
+  border: 1px solid #2a3a4e;
+  border-radius: 6px;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+/* Threshold Running Info */
+.threshold-running-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #60a5fa;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: #0c1e38;
+  border-radius: 6px;
+  border: 1px solid #1d3a5e;
+}
+
+.th-running-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3b82f6;
+  margin-left: auto;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Threshold Summary Cards */
+.threshold-summary-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.threshold-card {
+  padding: 14px 12px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.tc-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.tc-value {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.threshold-card.card-safe {
+  background: #0a2e1a;
+  border-color: #166534;
+}
+.threshold-card.card-safe .tc-label { color: #4ade80; }
+.threshold-card.card-safe .tc-value { color: #4ade80; }
+
+.threshold-card.card-breaking {
+  background: #1a0505;
+  border-color: #7f1d1d;
+}
+.threshold-card.card-breaking .tc-label { color: #f87171; }
+.threshold-card.card-breaking .tc-value { color: #f87171; }
+
+.threshold-card.card-tps {
+  background: #0c1e38;
+  border-color: #1d3a5e;
+}
+.threshold-card.card-tps .tc-label { color: #60a5fa; }
+.threshold-card.card-tps .tc-value { color: #60a5fa; }
+
+.threshold-card.card-unknown {
+  background: #1e2b3a;
+  border-color: #2a3a4e;
+}
+.threshold-card.card-unknown .tc-label { color: #6b8aab; }
+.threshold-card.card-unknown .tc-value { color: #64748b; }
+
+/* Threshold Tooltip */
+.threshold-tooltip {
+  background: #1e2b3a;
+  border: 1px solid #3a4a5e;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.tt-title {
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 6px;
+}
+
+.tt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+.tt-row span:last-child {
+  font-weight: 600;
+  color: #c0ccda;
+}
+
+/* Step Table */
+.step-table-wrapper {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.step-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.step-table th {
+  text-align: left;
+  padding: 8px 10px;
+  color: #6b8aab;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #2a3a4e;
+  white-space: nowrap;
+}
+
+.step-table td {
+  padding: 8px 10px;
+  color: #c0ccda;
+  border-bottom: 1px solid #1e2b3a;
+  white-space: nowrap;
+}
+
+.step-table tr:last-child td {
+  border-bottom: none;
+}
+
+.td-concurrency { font-weight: 700; color: #e2e8f0; }
+.td-success { color: #4ade80; }
+.td-fail { color: #f87171; }
+.td-error { color: #c0ccda; }
+.td-error-high { color: #f87171; font-weight: 600; }
+
+/* Verdict Chips */
+.verdict-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vd-good     { background: #166534; color: #4ade80; }
+.vd-warning  { background: #92400e; color: #fcd34d; }
+.vd-breaking { background: #7c2d12; color: #fb923c; }
+.vd-broken   { background: #7f1d1d; color: #f87171; }
+
+/* Threshold Recommendation */
+.threshold-recommendation {
+  margin-top: 16px;
+  background: #1a2332;
+  border-radius: 8px;
+  padding: 14px 16px;
+  border: 1px solid #2a3a4e;
+}
+
+.th-recommendation-text {
+  font-size: 13px;
+  color: #c0ccda;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+/* Mode Switcher */
+.mode-switcher {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: #1e2b3a;
+  border: 1px solid #2a3a4e;
+  border-radius: 10px;
+  padding: 4px;
+  width: fit-content;
+}
+
+.mode-btn {
+  background: none;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b8aab;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.mode-btn:hover {
+  color: #c0ccda;
+}
+
+.mode-btn.active {
+  background: #3b82f6;
+  color: #fff;
+}
+
+/* Auto Threshold Form */
+.auto-threshold-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  background: #1a2332;
+  border: 1px solid #2a3a4e;
+  border-radius: 8px;
+  padding: 12px 14px;
+  line-height: 1.6;
+}
+
+.auto-desc-detail {
+  font-size: 11px;
+  color: #6b8aab;
+}
+
+/* Phase Indicator */
+.phase-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: #1e2b3a;
+  border-radius: 8px;
+  border: 1px solid #2a3a4e;
+}
+
+.phase-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #4a5a6e;
+}
+
+.phase-step.phase-active {
+  color: #60a5fa;
+}
+
+.phase-step.phase-done {
+  color: #4ade80;
+}
+
+.phase-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2a3a4e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.phase-step.phase-active .phase-num {
+  background: #1d3a5e;
+  color: #60a5fa;
+}
+
+.phase-step.phase-done .phase-num {
+  background: #14532d;
+  color: #4ade80;
+}
+
+.phase-name {
+  font-weight: 600;
+}
+
+.phase-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3b82f6;
+  animation: pulse 1.2s infinite;
+}
+
+.phase-arrow {
+  color: #3a4a5e;
+  font-size: 12px;
+}
+
+.search-range {
+  font-size: 11px;
+  color: #6b8aab;
+  background: #1a2332;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Auto Result Card */
+.auto-result-card {
+  text-align: center;
+  padding: 24px 20px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+}
+
+.auto-result-found {
+  background: #0a2e1a;
+  border-color: #166534;
+}
+
+.auto-result-poor {
+  background: #1a0505;
+  border-color: #7f1d1d;
+}
+
+.auto-result-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4ade80;
+  margin-bottom: 8px;
+}
+
+.auto-result-poor .auto-result-label {
+  color: #f87171;
+}
+
+.auto-result-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #4ade80;
+  margin-bottom: 6px;
+}
+
+.auto-result-poor .auto-result-value {
+  color: #f87171;
+}
+
+.auto-result-sub {
+  font-size: 12px;
+  color: #86efac;
+  margin-bottom: 4px;
+}
+
+.auto-result-tps {
+  font-size: 12px;
+  color: #60a5fa;
+}
+
+/* Phase Chip in table */
+.phase-chip {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.phase-chip-escalation {
+  background: #1c2e4a;
+  color: #60a5fa;
+}
+
+.phase-chip-binary {
+  background: #2d1b4e;
+  color: #c084fc;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app {
@@ -626,5 +1082,13 @@ body {
 
   .result-latency-stats {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .threshold-summary-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .threshold-summary-cards .threshold-card:last-child {
+    grid-column: 1 / -1;
   }
 }

@@ -1,10 +1,22 @@
 import React, { useState, useCallback } from 'react';
 import TrafficForm from './components/TrafficForm';
 import ResultPanel from './components/ResultPanel';
+import ThresholdForm from './components/ThresholdForm';
+import ThresholdResultPanel from './components/ThresholdResultPanel';
+import AutoThresholdForm from './components/AutoThresholdForm';
+import AutoThresholdResultPanel from './components/AutoThresholdResultPanel';
 import { useTrafficSSE } from './hooks/useTrafficSSE';
+import { useThresholdSSE } from './hooks/useThresholdSSE';
+import { useAutoThresholdSSE } from './hooks/useAutoThresholdSSE';
 import { startTraffic, stopTraffic } from './services/trafficApi';
+import { startThreshold, stopThreshold } from './services/thresholdApi';
+import { startAutoThreshold, stopAutoThreshold } from './services/autoThresholdApi';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('traffic');
+  const [thresholdMode, setThresholdMode] = useState('manual'); // 'manual' | 'auto'
+
+  // ── Traffic state ──────────────────────────────────────────────
   const [taskId, setTaskId] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState(null);
@@ -33,40 +45,179 @@ export default function App() {
     }
   }, [taskId]);
 
-  // SSE에서 완료/중지 상태를 받으면 isRunning을 false로
   React.useEffect(() => {
     if (progress && progress.status !== 'RUNNING') {
       setIsRunning(false);
     }
   }, [progress]);
 
+  // ── Threshold state ────────────────────────────────────────────
+  const [thresholdTaskId, setThresholdTaskId] = useState(null);
+  const [isThresholdRunning, setIsThresholdRunning] = useState(false);
+  const [thresholdError, setThresholdError] = useState(null);
+  const { progress: thresholdProgress, connect: thresholdConnect, reset: thresholdReset } = useThresholdSSE();
+
+  const handleThresholdStart = useCallback(async (config) => {
+    try {
+      setThresholdError(null);
+      thresholdReset();
+      const response = await startThreshold(config);
+      setThresholdTaskId(response.taskId);
+      setIsThresholdRunning(true);
+      thresholdConnect(response.taskId);
+    } catch (err) {
+      setThresholdError(err.message);
+    }
+  }, [thresholdConnect, thresholdReset]);
+
+  const handleThresholdStop = useCallback(async () => {
+    if (!thresholdTaskId) return;
+    try {
+      await stopThreshold(thresholdTaskId);
+      setIsThresholdRunning(false);
+    } catch (err) {
+      setThresholdError(err.message);
+    }
+  }, [thresholdTaskId]);
+
+  React.useEffect(() => {
+    if (thresholdProgress && thresholdProgress.status !== 'RUNNING') {
+      setIsThresholdRunning(false);
+    }
+  }, [thresholdProgress]);
+
+  // ── Auto Threshold state ───────────────────────────────────────
+  const [autoTaskId, setAutoTaskId] = useState(null);
+  const [isAutoRunning, setIsAutoRunning] = useState(false);
+  const [autoError, setAutoError] = useState(null);
+  const { progress: autoProgress, connect: autoConnect, reset: autoReset } = useAutoThresholdSSE();
+
+  const handleAutoStart = useCallback(async (config) => {
+    try {
+      setAutoError(null);
+      autoReset();
+      const response = await startAutoThreshold(config);
+      setAutoTaskId(response.taskId);
+      setIsAutoRunning(true);
+      autoConnect(response.taskId);
+    } catch (err) {
+      setAutoError(err.message);
+    }
+  }, [autoConnect, autoReset]);
+
+  const handleAutoStop = useCallback(async () => {
+    if (!autoTaskId) return;
+    try {
+      await stopAutoThreshold(autoTaskId);
+      setIsAutoRunning(false);
+    } catch (err) {
+      setAutoError(err.message);
+    }
+  }, [autoTaskId]);
+
+  React.useEffect(() => {
+    if (autoProgress && autoProgress.status !== 'RUNNING') {
+      setIsAutoRunning(false);
+    }
+  }, [autoProgress]);
+
   return (
     <div className="app">
       <header className="app-header">
         <h1>Traffic Generator</h1>
-        <span className="app-version">v0.2.0</span>
+        <span className="app-version">v0.3.0</span>
       </header>
 
+      <div className="tabs">
+        <button
+          className={`tab-btn ${activeTab === 'traffic' ? 'active' : ''}`}
+          onClick={() => setActiveTab('traffic')}
+        >
+          트래픽 테스트
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'threshold' ? 'active' : ''}`}
+          onClick={() => setActiveTab('threshold')}
+        >
+          임계점 측정
+        </button>
+      </div>
+
       <main className="app-main">
-        {error && (
-          <div className="error-toast" onClick={() => setError(null)}>
-            {error}
-          </div>
+        {activeTab === 'traffic' && (
+          <>
+            {error && (
+              <div className="error-toast" onClick={() => setError(null)}>{error}</div>
+            )}
+            <section className="section">
+              <h2>Settings</h2>
+              <TrafficForm onStart={handleStart} onStop={handleStop} isRunning={isRunning} />
+            </section>
+            <section className="section">
+              <h2>Results</h2>
+              <ResultPanel progress={progress} isRunning={isRunning} />
+            </section>
+          </>
         )}
 
-        <section className="section">
-          <h2>Settings</h2>
-          <TrafficForm
-            onStart={handleStart}
-            onStop={handleStop}
-            isRunning={isRunning}
-          />
-        </section>
+        {activeTab === 'threshold' && (
+          <>
+            <div className="mode-switcher" style={{ gridColumn: '1 / -1' }}>
+              <button
+                className={`mode-btn ${thresholdMode === 'manual' ? 'active' : ''}`}
+                onClick={() => setThresholdMode('manual')}
+              >
+                수동 측정
+              </button>
+              <button
+                className={`mode-btn ${thresholdMode === 'auto' ? 'active' : ''}`}
+                onClick={() => setThresholdMode('auto')}
+              >
+                자동 임계점 측정
+              </button>
+            </div>
 
-        <section className="section">
-          <h2>Results</h2>
-          <ResultPanel progress={progress} isRunning={isRunning} />
-        </section>
+            {thresholdMode === 'manual' && (
+              <>
+                {thresholdError && (
+                  <div className="error-toast" onClick={() => setThresholdError(null)}>{thresholdError}</div>
+                )}
+                <section className="section">
+                  <h2>Settings</h2>
+                  <ThresholdForm
+                    onStart={handleThresholdStart}
+                    onStop={handleThresholdStop}
+                    isRunning={isThresholdRunning}
+                  />
+                </section>
+                <section className="section">
+                  <h2>Results</h2>
+                  <ThresholdResultPanel progress={thresholdProgress} isRunning={isThresholdRunning} />
+                </section>
+              </>
+            )}
+
+            {thresholdMode === 'auto' && (
+              <>
+                {autoError && (
+                  <div className="error-toast" onClick={() => setAutoError(null)}>{autoError}</div>
+                )}
+                <section className="section">
+                  <h2>Auto Settings</h2>
+                  <AutoThresholdForm
+                    onStart={handleAutoStart}
+                    onStop={handleAutoStop}
+                    isRunning={isAutoRunning}
+                  />
+                </section>
+                <section className="section">
+                  <h2>Results</h2>
+                  <AutoThresholdResultPanel progress={autoProgress} isRunning={isAutoRunning} />
+                </section>
+              </>
+            )}
+          </>
+        )}
       </main>
 
       <footer className="app-footer">

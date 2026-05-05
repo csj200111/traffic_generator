@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const toInt = (v) => (v === '' ? '' : (parseInt(v) || ''));
+
 const DEFAULT_CONFIG = {
   targetUrl: '',
   totalRequests: 100,
@@ -90,7 +92,7 @@ export default function TrafficForm({ onStart, onStop, isRunning }) {
             min="1"
             max="10000"
             value={config.totalRequests}
-            onChange={(e) => handleChange('totalRequests', parseInt(e.target.value) || 0)}
+            onChange={(e) => handleChange('totalRequests', toInt(e.target.value))}
             disabled={isRunning}
           />
           {errors.totalRequests && <span className="field-error">{errors.totalRequests}</span>}
@@ -104,7 +106,7 @@ export default function TrafficForm({ onStart, onStop, isRunning }) {
             min="1"
             max="500"
             value={config.concurrency}
-            onChange={(e) => handleChange('concurrency', parseInt(e.target.value) || 0)}
+            onChange={(e) => handleChange('concurrency', toInt(e.target.value))}
             disabled={isRunning}
           />
           {errors.concurrency && <span className="field-error">{errors.concurrency}</span>}
@@ -144,7 +146,7 @@ export default function TrafficForm({ onStart, onStop, isRunning }) {
               min="2"
               max="10"
               value={config.rampUpSteps}
-              onChange={(e) => handleChange('rampUpSteps', parseInt(e.target.value) || 2)}
+              onChange={(e) => handleChange('rampUpSteps', toInt(e.target.value))}
               disabled={isRunning}
             />
             <span className="ramp-up-desc">
