@@ -158,6 +158,7 @@ export default function AutoThresholdResultPanel({ progress, isRunning }) {
           <p className="th-recommendation-text">{progress.recommendation}</p>
         </div>
       )}
+
     </div>
   );
 }

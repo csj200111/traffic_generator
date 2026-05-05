@@ -84,6 +84,7 @@ export default function ResultPanel({ progress, isRunning }) {
       {progress.status !== 'RUNNING' && (
         <AnalysisSummary progress={progress} />
       )}
+
     </div>
   );
 }

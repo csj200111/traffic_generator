@@ -5,6 +5,7 @@ import ThresholdForm from './components/ThresholdForm';
 import ThresholdResultPanel from './components/ThresholdResultPanel';
 import AutoThresholdForm from './components/AutoThresholdForm';
 import AutoThresholdResultPanel from './components/AutoThresholdResultPanel';
+import HistoryPanel from './components/HistoryPanel';
 import { useTrafficSSE } from './hooks/useTrafficSSE';
 import { useThresholdSSE } from './hooks/useThresholdSSE';
 import { useAutoThresholdSSE } from './hooks/useAutoThresholdSSE';
@@ -16,6 +17,30 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('traffic');
   const [thresholdMode, setThresholdMode] = useState('manual'); // 'manual' | 'auto'
 
+  // ── 저장 기록 ────────────────────────────────────────────────
+  const [savedResults, setSavedResults] = useState([]);
+  const [trafficUrl, setTrafficUrl] = useState('');
+  const [thresholdUrl, setThresholdUrl] = useState('');
+  const [autoUrl, setAutoUrl] = useState('');
+
+  const handleSave = useCallback((type, url, progress) => {
+    setSavedResults(prev => [...prev, {
+      id: Date.now(),
+      type,
+      url,
+      savedAt: new Date(),
+      progress: JSON.parse(JSON.stringify(progress)),
+    }]);
+  }, []);
+
+  const handleDeleteResult = useCallback((id) => {
+    setSavedResults(prev => prev.filter(r => r.id !== id));
+  }, []);
+
+  const handleClearResults = useCallback(() => {
+    setSavedResults([]);
+  }, []);
+
   // ── Traffic state ──────────────────────────────────────────────
   const [taskId, setTaskId] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -26,6 +51,7 @@ export default function App() {
     try {
       setError(null);
       reset();
+      setTrafficUrl(config.targetUrl);
       const response = await startTraffic(config);
       setTaskId(response.taskId);
       setIsRunning(true);
@@ -48,6 +74,9 @@ export default function App() {
   React.useEffect(() => {
     if (progress && progress.status !== 'RUNNING') {
       setIsRunning(false);
+      if (progress.status === 'COMPLETED' || progress.status === 'STOPPED') {
+        handleSave('traffic', trafficUrl, progress);
+      }
     }
   }, [progress]);
 
@@ -61,6 +90,7 @@ export default function App() {
     try {
       setThresholdError(null);
       thresholdReset();
+      setThresholdUrl(config.targetUrl);
       const response = await startThreshold(config);
       setThresholdTaskId(response.taskId);
       setIsThresholdRunning(true);
@@ -83,6 +113,9 @@ export default function App() {
   React.useEffect(() => {
     if (thresholdProgress && thresholdProgress.status !== 'RUNNING') {
       setIsThresholdRunning(false);
+      if (thresholdProgress.status === 'COMPLETED' || thresholdProgress.status === 'STOPPED') {
+        handleSave('threshold', thresholdUrl, thresholdProgress);
+      }
     }
   }, [thresholdProgress]);
 
@@ -96,6 +129,7 @@ export default function App() {
     try {
       setAutoError(null);
       autoReset();
+      setAutoUrl(config.targetUrl);
       const response = await startAutoThreshold(config);
       setAutoTaskId(response.taskId);
       setIsAutoRunning(true);
@@ -118,6 +152,9 @@ export default function App() {
   React.useEffect(() => {
     if (autoProgress && autoProgress.status !== 'RUNNING') {
       setIsAutoRunning(false);
+      if (autoProgress.status === 'COMPLETED' || autoProgress.status === 'STOPPED') {
+        handleSave('auto', autoUrl, autoProgress);
+      }
     }
   }, [autoProgress]);
 
@@ -141,6 +178,15 @@ export default function App() {
         >
           임계점 측정
         </button>
+        <button
+          className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+          onClick={() => setActiveTab('history')}
+        >
+          테스트 기록
+          {savedResults.length > 0 && (
+            <span className="tab-count">{savedResults.length}</span>
+          )}
+        </button>
       </div>
 
       <main className="app-main">
@@ -155,7 +201,10 @@ export default function App() {
             </section>
             <section className="section">
               <h2>Results</h2>
-              <ResultPanel progress={progress} isRunning={isRunning} />
+              <ResultPanel
+                progress={progress}
+                isRunning={isRunning}
+              />
             </section>
           </>
         )}
@@ -192,7 +241,10 @@ export default function App() {
                 </section>
                 <section className="section">
                   <h2>Results</h2>
-                  <ThresholdResultPanel progress={thresholdProgress} isRunning={isThresholdRunning} />
+                  <ThresholdResultPanel
+                    progress={thresholdProgress}
+                    isRunning={isThresholdRunning}
+                  />
                 </section>
               </>
             )}
@@ -212,11 +264,25 @@ export default function App() {
                 </section>
                 <section className="section">
                   <h2>Results</h2>
-                  <AutoThresholdResultPanel progress={autoProgress} isRunning={isAutoRunning} />
+                  <AutoThresholdResultPanel
+                    progress={autoProgress}
+                    isRunning={isAutoRunning}
+                  />
                 </section>
               </>
             )}
           </>
+        )}
+
+        {activeTab === 'history' && (
+          <section className="section section-full">
+            <h2>테스트 기록</h2>
+            <HistoryPanel
+              results={savedResults}
+              onDelete={handleDeleteResult}
+              onClear={handleClearResults}
+            />
+          </section>
         )}
       </main>
 
