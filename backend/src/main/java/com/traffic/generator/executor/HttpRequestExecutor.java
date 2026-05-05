@@ -107,7 +107,11 @@ public class HttpRequestExecutor {
                     long responseTime = System.currentTimeMillis() - reqStart;
 
                     synchronized (progress) {
-                        progress.incrementSuccess();
+                        if (statusCode >= 400) {
+                            progress.incrementFail();
+                        } else {
+                            progress.incrementSuccess();
+                        }
                         progress.recordResponseTime(responseTime);
                         progress.recordStatusCode(statusCode);
                         progress.setElapsedTimeMs(System.currentTimeMillis() - startTime);

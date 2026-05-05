@@ -76,24 +76,33 @@ export default function AutoThresholdResultPanel({ progress, isRunning }) {
       )}
 
       {isCompleted && hasResult && (
-        <div className={`auto-result-card ${progress.finalThreshold > 0 ? 'auto-result-found' : 'auto-result-poor'}`}>
-          {progress.finalThreshold > 0 ? (
+        <div className={`auto-result-card ${
+          progress.finalThreshold === 0
+            ? 'auto-result-poor'
+            : progress.breakingPointConcurrency == null
+              ? 'auto-result-stable'
+              : 'auto-result-found'
+        }`}>
+          {progress.finalThreshold === 0 ? (
             <>
-              <div className="auto-result-label">발견된 임계점</div>
-              <div className="auto-result-value">동시접속 {progress.finalThreshold}명</div>
-              {progress.breakingPointConcurrency && (
-                <div className="auto-result-sub">
-                  {progress.breakingPointConcurrency}명부터 성능 저하
-                </div>
-              )}
-              {progress.maxTps > 0 && (
-                <div className="auto-result-tps">최대 TPS: {progress.maxTps.toFixed(1)} req/s</div>
-              )}
+              <div className="auto-result-label">서버 불안정</div>
+              <div className="auto-result-value" style={{ fontSize: 18 }}>최소 부하에서 이미 오류 발생</div>
             </>
-          ) : (
+          ) : progress.breakingPointConcurrency == null ? (
             <>
               <div className="auto-result-label">임계점 미도달</div>
               <div className="auto-result-value" style={{ fontSize: 18 }}>서버 안정적</div>
+            </>
+          ) : (
+            <>
+              <div className="auto-result-label">발견된 임계점</div>
+              <div className="auto-result-value">동시접속 {progress.finalThreshold}명</div>
+              <div className="auto-result-sub">
+                {progress.breakingPointConcurrency}명부터 성능 저하
+              </div>
+              {progress.maxTps > 0 && (
+                <div className="auto-result-tps">최대 TPS: {progress.maxTps.toFixed(1)} req/s</div>
+              )}
             </>
           )}
         </div>
