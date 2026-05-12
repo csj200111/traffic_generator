@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import ResultPanel from './ResultPanel';
 import ThresholdResultPanel from './ThresholdResultPanel';
 import AutoThresholdResultPanel from './AutoThresholdResultPanel';
+import { exportToPdf } from '../utils/exportPdf';
 
 const TYPE_CFG = {
   traffic:   { label: '트래픽 테스트',      cls: 'hist-badge-traffic' },
@@ -39,7 +40,10 @@ export default function HistoryDetailModal({ item, onClose }) {
           </div>
           <div className="modal-meta-row">
             <span className="modal-saved-at">저장 시각: {formatDateTime(item.savedAt)}</span>
-            <button className="modal-close-btn" onClick={onClose}>✕</button>
+            <div className="modal-actions">
+              <button className="modal-pdf-btn" onClick={() => exportToPdf(item)} title="PDF로 저장">PDF 저장</button>
+              <button className="modal-close-btn" onClick={onClose}>✕</button>
+            </div>
           </div>
         </div>
 

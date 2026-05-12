@@ -1363,6 +1363,32 @@ body {
   color: #4a6a8a;
 }
 
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-pdf-btn {
+  background: none;
+  border: 1px solid #3a4a5e;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+
+.modal-pdf-btn:hover {
+  background: #1e3a5f;
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
 .modal-close-btn {
   background: none;
   border: 1px solid #2a3a4e;
